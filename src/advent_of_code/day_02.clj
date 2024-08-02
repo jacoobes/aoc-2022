@@ -35,13 +35,11 @@
         result (case me "X"  (losemap op-sc)      ;lose
                         "Y"  op-sc                 ;draw
                         "Z"  (winmap op-sc))] ;win
-    (println "op " op "   " op-sc  "result " me "  " result  "  =" (calculate-scores [op-sc result]  ))
     (calculate-scores [op-sc result])))
 
 (defn part-2
   "Day 02 Part 2"
   [input]
   (->> (map #(str/split % #" ") (str/split-lines input))
-       #_(take 15)
        (map calculate-scores-foreal)
        (reduce +)))
