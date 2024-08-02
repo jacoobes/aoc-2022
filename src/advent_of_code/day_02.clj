@@ -6,7 +6,7 @@
 ; keep in mind this is circular, because rock beats paper as well. thats why we have to modulo and ensure positive
 (def rps-scores { "A" 1 "B" 2 "C" 3 
                   "X" 1 "Y" 2 "Z" 3 })
-
+(def rev { 1 "A" 2 "B" 3 "C" })
 (def match-scores { 0 3    ; draw
                     1 6 }) ; win
 
@@ -22,16 +22,26 @@
        (map calculate-scores)
        (reduce +)))
 
+(def winmap { 1 2
+              2 3
+              3 1 })
+
+(def losemap { 1 3 
+               2 1 
+               3 2 })
+
 (defn calculate-scores-foreal [[op me]]
   (let [op-sc (rps-scores op)
-        me-sc (rps-scores me)]
-    (case me "X" (calculate-scores [op-sc (inc op-sc)])    ; must lose
-             "Y" (calculate-scores [op-sc op-sc])          ;must draw
-             "Z" (calculate-scores [op-sc (dec op-sc)])))) ; must win
+        result (case me "X"  (losemap op-sc)      ;lose
+                        "Y"  op-sc                 ;draw
+                        "Z"  (winmap op-sc))] ;win
+    (println "op " op "   " op-sc  "result " me "  " result  "  =" (calculate-scores [op-sc result]  ))
+    (calculate-scores [op-sc result])))
 
 (defn part-2
   "Day 02 Part 2"
   [input]
   (->> (map #(str/split % #" ") (str/split-lines input))
+       #_(take 15)
        (map calculate-scores-foreal)
-       ))
+       (reduce +)))
