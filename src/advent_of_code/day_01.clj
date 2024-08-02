@@ -7,10 +7,11 @@
        (partition-by str/blank?)
        (map #(reduce + (map clojure.edn/read-string %)))
        (filter some?)))
+
 (defn part-1
   "Day 01 Part 1"
   [input]
-  (apply (get-nums input) max))
+  (apply max (get-nums input)))
 
 (defn part-2
   "Day 01 Part 2"
