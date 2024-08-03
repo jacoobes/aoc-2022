@@ -10,18 +10,14 @@
 ; if range1 end greater than range2 start or viceversa
 (defn overlaps? [range1 range2]
   (cond (or (empty? range1) (empty? range2)) false
-        :else (or (num-in range1 (first range2))
-                  (num-in range1 (last range2))
-                  (num-in range2 (last range1))
-                  (num-in range2 (first range1)))))
+        :else (or (num-in range1 (first range2)) (num-in range1 (last range2))
+                  (num-in range2 (last range1)) (num-in range2 (first range1)))))
 
 (defn contains-rng [range1 range2]
   (cond (empty? range1) false
         (empty? range2) false
-        :else (or (and (num-in range2 (first range1)) 
-                       (num-in range2 (last range1)))
-                  (and (num-in range1 (first range2)) 
-                       (num-in range1 (last range2))))))
+        :else (or (and (num-in range2 (first range1)) (num-in range2 (last range1)))
+                  (and (num-in range1 (first range2)) (num-in range1 (last range2))))))
 
 (defn parse-range [s]
   (let [ranges (map #(str/replace % #"-" " ") (str/split s #","))]
