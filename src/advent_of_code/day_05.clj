@@ -31,23 +31,21 @@
 (defn transaction [topf dest]
   (reduce conj dest topf))
 
-(defn interpret-instructions [chart instructions]
+(defn interpret-instructions [chart instructions f]
  (reduce (fn [acc [quant from dest]]
               (let [from-vec (acc (dec from)) 
                     [bottomf topf] (map vec (split-at (- (count from-vec) quant) from-vec))]
                 (-> acc (assoc (dec from) bottomf)
-                        ; if u wanna solve part 2, dont revert topf
-                        (update (dec dest) (partial transaction (reverse topf ) ))))) 
+                        (update (dec dest) (partial transaction (f topf) ))))) 
             chart instructions ))
 (defn part-1
   "Day 05 Part 1"
   [input]
   (let [{:keys [chart instructions]} (parse (str/split-lines input)) ]
-    (->> (interpret-instructions chart instructions)
-         (map last)
-         )))
+    (->> (interpret-instructions chart instructions reverse)
+         (map last))))
 
-(defn part-2
-  "Day 05 Part 2"
-  [input]
-  input)
+(defn part-2 "Day 05 Part 2" [input] 
+  (let [{:keys [chart instructions]} (parse (str/split-lines input)) ]
+    (->> (interpret-instructions chart instructions identity)
+         (map last))))
