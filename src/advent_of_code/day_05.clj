@@ -4,7 +4,7 @@
 
 (defn instructions [lines]
   ; mv x from y to z
-  (->> (map #(re-seq #"\d" %) lines)
+  (->> (map #(re-seq #"\d+" %) lines)
        (map #(map read-string %))))
 
 (defn parse-line [numcol line]
@@ -23,22 +23,29 @@
 (defn parse [lines]
    (loop [[fst nxt & rst] lines
            chart []] 
-     (if (str/starts-with? nxt "move")
+     (if (str/starts-with? (or nxt "move") "move")
           {:chart (vec (parse-chart (reverse chart)))  
            :instructions (instructions (cons nxt rst))}  
           (recur (cons nxt rst) (conj chart fst)))))
 
-(defn transaction [quant from acc dest]
-  dest
-   )
+(defn transaction [topf dest]
+  (reduce conj dest topf))
 
+(defn interpret-instructions [chart instructions]
+ (reduce (fn [acc [quant from dest]]
+              (let [from-vec (acc (dec from)) 
+                    [bottomf topf] (map vec (split-at (- (count from-vec) quant) from-vec))]
+                (-> acc (assoc (dec from) bottomf)
+                        ; if u wanna solve part 2, dont revert topf
+                        (update (dec dest) (partial transaction (reverse topf ) ))))) 
+            chart instructions ))
 (defn part-1
   "Day 05 Part 1"
   [input]
   (let [{:keys [chart instructions]} (parse (str/split-lines input)) ]
-    (reduce (fn [acc [quant from dest]]
-              (update acc (dec dest) (partial transaction quant from acc))) 
-            chart instructions )))
+    (->> (interpret-instructions chart instructions)
+         (map last)
+         )))
 
 (defn part-2
   "Day 05 Part 2"
