@@ -22,23 +22,31 @@
                                          centries (count entries)]
                                      (recur (drop centries rst) dirpath
                                             (update-in tree dirpath (fn [dest] {:size (reduce + (map :size entries)) 
-                                                                                      :parent (->> dirpath pop peek)} ))))
+                                                                                :parent (->> dirpath pop peek)}))))
            (= "cd" (fst :command)) (let [dest (:arg fst)]
                                       (if (= ".." dest)
                                         (recur rst (pop dirpath) tree)
                                         (let [curdir (peek dirpath)]
                                           (recur rst (conj dirpath dest) tree))))))))
-(defn parse-output [lines] 
+
+(defn create-children [mp]
+  (let [kys (keys mp)]
+    (map #(-> (mp %) (assoc :name %)) (filter string? kys))))
+
+(defn calculate-size [lines] 
   (let [tree (->> lines (map #(if (str/starts-with? % "$") (usr-command %) (dirent %)))
-                        into-tree)] 
-     (tree-seq map? identity tree)))
+                        into-tree)
+        dirseq (rest  (tree-seq map? create-children tree))] 
+    dirseq
+      #_(map #() dirseq)))
+
 (defn part-1
   "Day 07 Part 1"
   [input]
   (->> (clojure.string/split-lines input)
-       (parse-output)))
+       (calculate-size)))
 
-(let [input (slurp "./resources/day-07-example.txt")]
+(let [input (slurp "./resources/day-07-example.txt" )]
   (part-1 input))
 
 (reduce (fn [acc [k v]] (println k)) {:a 1 :b 5})
